@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Krrish Ray — Web Developer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #FAF8F1;
+    --grid-line: rgba(15,42,71,0.07);
+    --ink: #0F2A47;
+    --ink-soft: #4B5D6E;
+    --ink-faint: #8496A6;
+    --accent: #0E7C86;
+    --accent-soft: rgba(14,124,134,0.12);
+    --amber: #C9860A;
+    --amber-soft: rgba(201,134,10,0.14);
+    --line: rgba(15,42,71,0.18);
+    --paper: #FFFFFF;
+    --radius: 3px;
+    --maxw: 980px;
+    color-scheme: light;
+  }
+
+  :root[data-theme="dark"]{
+    --bg: #0B2340;
+    --grid-line: rgba(255,255,255,0.07);
+    --ink: #EAF2F8;
+    --ink-soft: #B7CBDC;
+    --ink-faint: #7C93A8;
+    --accent: #52DAD3;
+    --accent-soft: rgba(82,218,211,0.14);
+    --amber: #F2C230;
+    --amber-soft: rgba(242,194,48,0.16);
+    --line: rgba(255,255,255,0.16);
+    --paper: #10294A;
+    color-scheme: dark;
+  }
+
+  body{ transition: background 0.2s ease, color 0.2s ease; }
+  @media (prefers-reduced-motion: reduce){ body{ transition: none; } }
+
+  *{ box-sizing: border-box; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
+  }
+
+  body{
+    margin:0;
+    background:
+      linear-gradient(var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px) 0 0 / 28px 28px,
+      var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  a{ color: var(--accent); text-decoration: none; }
+  a:hover{ text-decoration: underline; }
+  a:focus-visible, button:focus-visible, summary:focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 24px; }
+
+  .mono{ font-family: 'IBM Plex Mono', monospace; }
+  .display{ font-family: 'Space Grotesk', sans-serif; }
+
+  /* ---- crop marks used at section boundaries ---- */
+  .crop{
+    position: relative;
+    border-top: 1px solid var(--line);
+    padding-top: 56px;
+    margin-top: 56px;
+  }
+  .crop::before, .crop::after{
+    content: "";
+    position: absolute;
+    top: -1px;
+    width: 1px;
+    height: 12px;
+    background: var(--ink);
+  }
+  .crop::before{ left: 0; }
+  .crop::after{ right: 0; }
+
+  /* ---- nav ---- */
+  header.site{
+    position: sticky; top:0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 90%, transparent);
+    backdrop-filter: blur(6px);
+    border-bottom: 1px solid var(--line);
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  nav.wrap{
+    display:flex; align-items:center; justify-content:space-between;
+    height: 64px;
+  }
+  .logo{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Space Grotesk', sans-serif; font-weight:700; font-size: 18px;
+    color: var(--ink);
+  }
+  .logo .mark{
+    width: 30px; height: 30px;
+    border: 1.5px solid var(--ink);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'IBM Plex Mono', monospace; font-size: 12px; font-weight:600;
+    color: var(--ink);
+  }
+  nav ul{
+    display:flex; gap: 28px; list-style:none; margin:0; padding:0;
+    font-family:'IBM Plex Mono', monospace; font-size: 13px; letter-spacing: 0.03em;
+  }
+  nav ul a{ color: var(--ink-soft); text-transform: uppercase; }
+  nav ul a:hover{ color: var(--accent); text-decoration:none; }
+  .nav-toggle{ display:none; background:none; border:1px solid var(--line); border-radius: var(--radius); padding:6px 10px; font-family:'IBM Plex Mono',monospace; cursor:pointer; color: var(--ink); }
+
+  .theme-toggle{
+    display:flex; align-items:center; gap:6px;
+    background: var(--paper); border:1px solid var(--line); border-radius: 20px;
+    padding: 6px 12px; font-family:'IBM Plex Mono',monospace; font-size:12px;
+    color: var(--ink); cursor:pointer;
+  }
+  .theme-toggle:hover{ border-color: var(--accent); color: var(--accent); }
+
+  @media (max-width: 720px){
+    nav ul{ display:none; }
+    .nav-toggle{ display:block; }
+    nav ul.open{
+      display:flex; flex-direction:column; gap: 14px;
+      position:absolute; top:64px; left:0; right:0;
+      background: var(--bg); padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+    }
+  }
+
+  /* ---- title block (hero signature) ---- */
+  .hero{ padding: 64px 0 40px; }
+  .titleblock{
+    border: 1px solid var(--ink);
+    display:inline-grid;
+    grid-template-columns: repeat(4, auto);
+    margin-bottom: 40px;
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 11px;
+    background: var(--paper);
+  }
+  .titleblock div{
+    padding: 8px 14px;
+    border-right: 1px solid var(--line);
+  }
+  .titleblock div:last-child{ border-right:none; }
+  .titleblock .label{ color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.06em; display:block; margin-bottom:3px;}
+  .titleblock .value{ color: var(--ink); font-weight:600; }
+  .status-dot{ display:inline-block; width:6px; height:6px; border-radius:50%; background:var(--accent); margin-right:6px; }
+
+  h1.headline{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.1rem, 5vw, 3.4rem);
+    line-height: 1.08;
+    margin: 0 0 20px;
+    max-width: 15ch;
+    letter-spacing: -0.01em;
+  }
+  h1.headline .u{
+    text-decoration: underline;
+    text-decoration-color: var(--amber);
+    text-decoration-thickness: 3px;
+    text-underline-offset: 4px;
+  }
+  .sub{
+    font-size: 1.05rem;
+    color: var(--ink-soft);
+    max-width: 56ch;
+    margin: 0 0 32px;
+  }
+  .cta-row{ display:flex; gap:14px; flex-wrap:wrap; }
+  .btn{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 13px;
+    padding: 12px 20px;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius);
+    display:inline-block;
+    color: var(--ink);
+    letter-spacing: 0.02em;
+  }
+  .btn.primary{ background: var(--ink); color: var(--bg); }
+  .btn.primary:hover{ background: var(--accent); border-color: var(--accent); text-decoration:none; }
+  .btn:not(.primary):hover{ background: var(--accent-soft); text-decoration:none; }
+
+  /* ---- section heading ---- */
+  .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin: 0 0 8px;
+  }
+  h2.sec-title{
+    font-family:'Space Grotesk', sans-serif;
+    font-size: 1.7rem;
+    margin: 0 0 28px;
+  }
+
+  /* ---- about ---- */
+  .about-grid{
+    display:grid; grid-template-columns: 1.4fr 1fr; gap: 48px;
+  }
+  @media (max-width:720px){ .about-grid{ grid-template-columns: 1fr; } }
+  .facts{ font-family:'IBM Plex Mono', monospace; font-size: 13px; }
+  .facts dt{ color: var(--ink-faint); text-transform:uppercase; letter-spacing:0.05em; font-size:11px; margin-top:14px; }
+  .facts dd{ margin:2px 0 0; color: var(--ink); }
+
+  /* ---- skills legend ---- */
+  .legend-group{ margin-bottom: 22px; }
+  .legend-group h3{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px; text-transform:uppercase; letter-spacing:0.06em;
+    color: var(--ink-faint); margin: 0 0 10px;
+  }
+  .chips{ display:flex; flex-wrap:wrap; gap:8px; }
+  .chip{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12.5px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    color: var(--ink);
+  }
+
+  /* ---- revision log (experience) ---- */
+  .rev{
+    display:grid;
+    grid-template-columns: 90px 1fr;
+    gap: 24px;
+    padding: 24px 0;
+    border-top: 1px solid var(--line);
+  }
+  .rev:first-of-type{ border-top: none; }
+  .rev-tag{
+    font-family:'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    font-weight:600;
+    padding-top: 3px;
+  }
+  .rev h3{ font-family:'Space Grotesk', sans-serif; font-size: 1.15rem; margin: 0 0 4px; }
+  .rev .meta{ font-family:'IBM Plex Mono', monospace; font-size:12px; color: var(--ink-faint); margin-bottom: 10px; }
+  .rev ul{ margin: 0; padding-left: 18px; color: var(--ink-soft); }
+  .rev li{ margin-bottom: 4px; }
+  .current-badge{
+    display:inline-block; font-family:'IBM Plex Mono',monospace; font-size:10px;
+    background: var(--amber-soft); color: var(--amber); padding: 2px 8px; border-radius: 20px;
+    margin-left: 8px; text-transform:uppercase; letter-spacing:0.05em; vertical-align: middle;
+  }
+
+  /* ---- project sheets ---- */
+  .sheets{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  @media (max-width: 860px){ .sheets{ grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 600px){ .sheets{ grid-template-columns: 1fr; } }
+  .sheet{
+    border: 1px solid var(--line);
+    background: var(--paper);
+    border-radius: var(--radius);
+    display:flex; flex-direction:column;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+  }
+  .sheet:hover{ transform: translateY(-3px); box-shadow: 0 10px 24px rgba(15,42,71,0.08); }
+  .sheet-head{
+    display:flex; justify-content:space-between; align-items:center;
+    padding: 12px 16px; border-bottom: 1px solid var(--line);
+    font-family:'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-faint);
+  }
+  .sheet-body{ padding: 16px; flex:1; display:flex; flex-direction:column; }
+  .sheet-body h3{ font-family:'Space Grotesk',sans-serif; font-size:1.05rem; margin:0 0 8px; }
+  .sheet-body p{ color: var(--ink-soft); font-size: 14px; margin: 0 0 14px; flex:1; }
+  .sheet-tags{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom: 12px; }
+  .tag-sm{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px;
+    background: var(--accent-soft); color: var(--accent);
+    padding: 3px 8px; border-radius: 20px;
+  }
+  .sheet-link{ font-family:'IBM Plex Mono',monospace; font-size:12px; }
+
+  /* ---- blog / log ---- */
+  .log-entry{
+    border-top: 1px solid var(--line);
+    padding: 22px 0;
+  }
+  .log-entry:first-of-type{ border-top:none; }
+  .log-entry summary{
+    cursor:pointer;
+    list-style:none;
+    display:grid;
+    grid-template-columns: 110px 1fr auto;
+    align-items:baseline;
+    gap: 18px;
+  }
+  .log-entry summary::-webkit-details-marker{ display:none; }
+  .log-date{ font-family:'IBM Plex Mono',monospace; font-size:12px; color: var(--ink-faint); }
+  .log-title{ font-family:'Space Grotesk',sans-serif; font-size:1.1rem; }
+  .log-toggle{ font-family:'IBM Plex Mono',monospace; font-size:12px; color: var(--accent); }
+  .log-entry[open] .log-toggle::after{ content: "− close"; }
+  .log-entry:not([open]) .log-toggle::after{ content: "+ read"; }
+  .log-body{ padding: 14px 0 0 128px; color: var(--ink-soft); font-size: 14.5px; max-width: 62ch; }
+  @media (max-width:600px){
+    .log-entry summary{ grid-template-columns: 1fr; gap: 4px; }
+    .log-body{ padding-left: 0; }
+  }
+
+  /* ---- contact ---- */
+  .contact-block{
+    border: 1px solid var(--ink);
+    padding: 32px;
+    display:grid;
+    grid-template-columns: 1.3fr 1fr;
+    gap: 32px;
+    background: var(--paper);
+    border-radius: var(--radius);
+  }
+  @media (max-width:720px){ .contact-block{ grid-template-columns:1fr; } }
+  .contact-block h2{ font-family:'Space Grotesk',sans-serif; font-size:1.5rem; margin:0 0 10px; }
+  .contact-list{ font-family:'IBM Plex Mono',monospace; font-size:13px; }
+  .contact-list div{ margin-bottom: 10px; }
+  .contact-list .label{ color: var(--ink-faint); display:inline-block; width: 90px; }
+
+  footer{
+    margin-top: 80px;
+    border-top: 1px solid var(--line);
+    padding: 24px 0 60px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size: 11.5px;
+    color: var(--ink-faint);
+    display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;
+  }
+
+  section{ padding-bottom: 12px; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <nav class="wrap">
+    <div class="logo"><span class="mark">KR</span> Krrish Ray</div>
+    <div style="display:flex; align-items:center; gap:14px;">
+      <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false">
+        <span id="themeIcon">☾</span> <span id="themeLabel">Dark</span>
+      </button>
+      <button class="nav-toggle" id="navToggle" aria-expanded="false" aria-controls="navMenu">MENU</button>
+    </div>
+    <ul id="navMenu">
+      <li><a href="#about">About</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#work">Work</a></li>
+      <li><a href="#log">The Log</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="wrap">
+
+  <section class="hero" id="top">
+    <div class="titleblock">
+      <div><span class="label">Name</span><span class="value">Krrish Ray</span></div>
+      <div><span class="label">Role</span><span class="value">Web Developer — MERN</span></div>
+      <div><span class="label">Based</span><span class="value">Kolkata, India</span></div>
+      <div><span class="label">Status</span><span class="value"><span class="status-dot"></span>Open to internships</span></div>
+    </div>
+
+    <h1 class="headline">Drafting software, <span class="u">one build</span> at a time.</h1>
+    <p class="sub">B.Sc. student and MERN stack developer, currently interning at 5 Petal India. I build full-stack features, ship them through GitHub, and I'm getting hands-on with AI-assisted development and Retrieval-Augmented Generation along the way.</p>
+    <div class="cta-row">
+      <a class="btn primary" href="#work">View the work</a>
+      <a class="btn" href="#log">Read the log</a>
+      <a class="btn" href="#contact">Get in touch</a>
+    </div>
+  </section>
+
+  <section class="crop" id="about">
+    <p class="eyebrow">01 — About</p>
+    <h2 class="sec-title">The short version</h2>
+    <div class="about-grid">
+      <div>
+        <p>I'm a Pure Science undergraduate at Surendranath College (University of Calcutta), currently working as a Web Development Intern at 5 Petal India, building across the MERN stack. Alongside coursework, I completed a full-stack bootcamp (100xDevs) covering DevOps, data structures, and — most recently — a hands-on module on building AI-powered applications with Retrieval-Augmented Generation.</p>
+        <p>I like understanding how things are actually put together — from REST API routing logic to how an LLM grounds its answers in real data — and I document what I learn as I go, partly for myself and partly for whoever's reading.</p>
+      </div>
+      <dl class="facts">
+        <dt>Education</dt>
+        <dd>B.Sc. Pure Science, Univ. of Calcutta (2027)</dd>
+        <dt>Currently</dt>
+        <dd>Web Dev Intern, 5 Petal India</dd>
+        <dt>Languages</dt>
+        <dd>English, Bengali, Hindi</dd>
+        <dt>Location</dt>
+        <dd>Panihati, West Bengal, IN</dd>
+      </dl>
+    </div>
+  </section>
+
+  <section class="crop" id="skills">
+    <p class="eyebrow">02 — Skills</p>
+    <h2 class="sec-title">Legend</h2>
+
+    <div class="legend-group">
+      <h3>Stack</h3>
+      <div class="chips">
+        <span class="chip">MongoDB</span><span class="chip">Express</span><span class="chip">React</span>
+        <span class="chip">Node.js</span><span class="chip">JavaScript</span><span class="chip">Python</span>
+        <span class="chip">HTML / CSS</span><span class="chip">REST APIs</span>
+      </div>
+    </div>
+    <div class="legend-group">
+      <h3>AI &amp; Tooling</h3>
+      <div class="chips">
+        <span class="chip">RAG fundamentals</span><span class="chip">LLM API integration</span>
+        <span class="chip">Prompt engineering basics</span><span class="chip">Claude</span>
+        <span class="chip">Antigravity</span><span class="chip">Gemini</span>
+      </div>
+    </div>
+    <div class="legend-group">
+      <h3>Workflow &amp; Infra</h3>
+      <div class="chips">
+        <span class="chip">Git / GitHub</span><span class="chip">Deployment</span>
+        <span class="chip">AWS</span><span class="chip">Debugging</span><span class="chip">Technical documentation</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="crop" id="experience">
+    <p class="eyebrow">03 — Experience</p>
+    <h2 class="sec-title">Revision log</h2>
+
+    <div class="rev">
+      <div class="rev-tag">REV·002</div>
+      <div>
+        <h3>Web Development Intern — MERN Stack<span class="current-badge">In progress</span></h3>
+        <div class="meta">5 Petal India · Aug 2026 – Present · 3-month internship</div>
+        <ul>
+          <li>Building and maintaining features across the MERN stack (MongoDB, Express, React, Node.js).</li>
+          <li>Contributing to frontend (React components/UI) and backend (Node/Express API) on live project work.</li>
+          <li>Managing version control and deployment workflows through GitHub.</li>
+          <li>Using AI-assisted tools (Claude, Antigravity, Gemini) day-to-day for coding, debugging, and documentation.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="rev">
+      <div class="rev-tag">REV·001</div>
+      <div>
+        <h3>Hands-On Intern — Computer Application Programming</h3>
+        <div class="meta">George Telegraph Training Institute (GTTI) &amp; Surendranath College · May 2025 – Jun 2025</div>
+        <ul>
+          <li>Completed a 15-day, 60-hour full-time internship applying foundational programming concepts to real tasks.</li>
+          <li>Practiced applied software operations and technical problem-solving in a structured, deadline-driven setting.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="crop" id="work">
+    <p class="eyebrow">04 — Selected work</p>
+    <h2 class="sec-title">Project sheets</h2>
+
+    <div class="sheets">
+      <div class="sheet">
+        <div class="sheet-head"><span>SHEET · 01</span><span>CONTEST</span></div>
+        <div class="sheet-body">
+          <h3>Digital Vault &amp; API Development</h3>
+          <p>REST APIs for multi-signature digital vaults, built under contest time constraints, with request routing and validation logic for secure data handling.</p>
+          <div class="sheet-tags"><span class="tag-sm">Node.js</span><span class="tag-sm">Express</span><span class="tag-sm">REST</span></div>
+          <a class="sheet-link" href="https://github.com/krrishray" target="_blank" rel="noopener">View on GitHub →</a>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><span>SHEET · 02</span><span>PERSONAL</span></div>
+        <div class="sheet-body">
+          <h3>Interactive Web Experiences</h3>
+          <p>A multi-level interactive web app built with vanilla JavaScript — dynamic DOM manipulation, custom CSS animation, and sequential state logic across levels.</p>
+          <div class="sheet-tags"><span class="tag-sm">JavaScript</span><span class="tag-sm">CSS</span><span class="tag-sm">DOM</span></div>
+          <a class="sheet-link" href="https://github.com/krrishray" target="_blank" rel="noopener">View on GitHub →</a>
+        </div>
+      </div>
+
+      <div class="sheet">
+        <div class="sheet-head"><span>SHEET · 03</span><span>BOOTCAMP</span></div>
+        <div class="sheet-body">
+          <h3>AI-Powered App Prototypes (RAG)</h3>
+          <p>Hands-on 100xDevs module on Retrieval-Augmented Generation — integrating LLM APIs and vector-based retrieval to ground responses in custom data.</p>
+          <div class="sheet-tags"><span class="tag-sm">RAG</span><span class="tag-sm">LLM APIs</span><span class="tag-sm">Prompt design</span></div>
+          <a class="sheet-link" href="https://github.com/krrishray" target="_blank" rel="noopener">View on GitHub →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="crop" id="log">
+    <p class="eyebrow">05 — Writing</p>
+    <h2 class="sec-title">The log</h2>
+
+    <details class="log-entry" open>
+      <summary>
+        <span class="log-date mono">2026.08</span>
+        <span class="log-title">Day one: starting my MERN internship at 5 Petal India</span>
+        <span class="log-toggle"></span>
+      </summary>
+      <div class="log-body">
+        First week notes from starting a 3-month web dev internship. Getting oriented in an existing MERN codebase is a different skill from building something from scratch — reading someone else's routing conventions, folder structure, and state management choices before touching a single line. Early goal: understand the "why" behind the existing architecture before proposing anything new.
+        <br><br><em>— week-one notes .</em>
+      </div>
+    </details>
+
+    <details class="log-entry">
+      <summary>
+        <span class="log-date mono">2026.07</span>
+        <span class="log-title">What RAG actually does, in plain terms</span>
+        <span class="log-toggle"></span>
+      </summary>
+      <div class="log-body">
+        Retrieval-Augmented Generation sounds more complicated than it is: instead of relying only on what a language model already "knows," you retrieve relevant chunks of your own data first, then hand those to the model alongside the question. The model's job shifts from recalling facts to reasoning over what's in front of it. Notes from working through this in a bootcamp module — including where vector search fits in and why grounding matters for accuracy.
+        <br><br><em>—  RAG build .</em>
+      </div>
+    </details>
+
+    <details class="log-entry">
+      <summary>
+        <span class="log-date mono">2026.06</span>
+        <span class="log-title">Notes on deploying with GitHub</span>
+        <span class="log-toggle"></span>
+      </summary>
+      <div class="log-body">
+        A short reflection on version control and deployment workflow habits picked up early in the internship — branching before touching shared code, writing commit messages someone else can actually understand, and what changes once deployment isn't just "push and hope."
+        <br><br><em>— My deployment setup .</em>
+      </div>
+    </details>
+  </section>
+
+  <section class="crop" id="contact">
+    <p class="eyebrow">06 — Contact</p>
+    <div class="contact-block">
+      <div>
+        <h2>Let's build something.</h2>
+        <p style="color:var(--ink-soft); max-width:42ch;">Open to internship and junior developer opportunities. Fastest way to reach me is email.</p>
+        <a class="btn primary" href="mailto:krrishnray@gmail.com">Email me →</a>
+      </div>
+      <div class="contact-list">
+        <div><span class="label">Email</span><a href="mailto:krrishnray@gmail.com">krrishnray@gmail.com</a></div>
+        <div><span class="label">twitter</span><a href="https://x.com/KrrishnRay" target="_blank" rel="noopener">x.com/KrrishnRay</a></div>
+        <div><span class="label">GitHub</span><a href="https://github.com/krrishray" target="_blank" rel="noopener">github.com/krrishray</a></div>
+        <div><span class="label">LinkedIn</span><a href="https://www.linkedin.com/in/krrish-ray-38041422b/" target="_blank" rel="noopener">linkedin.com/krrish-ray</a></div>
+        <div><span class="label">Location</span>kolkata, India</div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <span>© 2026 Krrish Ray. Built with HTML, CSS, and a bit of AI-assisted drafting.</span>
+  <span>Last revised: Aug 2026</span>
+</footer>
+
+<script>
+  // Theme: default to system preference, override on click (session only, no storage)
+  const root = document.documentElement;
+  const themeBtn = document.getElementById('themeToggle');
+  const themeIcon = document.getElementById('themeIcon');
+  const themeLabel = document.getElementById('themeLabel');
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  let isDark = prefersDark;
+
+  function applyTheme(){
+    if(isDark){
+      root.setAttribute('data-theme','dark');
+      themeIcon.textContent = '☀';
+      themeLabel.textContent = 'Light';
+      themeBtn.setAttribute('aria-pressed','true');
+    } else {
+      root.setAttribute('data-theme','light');
+      themeIcon.textContent = '☾';
+      themeLabel.textContent = 'Dark';
+      themeBtn.setAttribute('aria-pressed','false');
+    }
+  }
+  applyTheme();
+  themeBtn.addEventListener('click', () => { isDark = !isDark; applyTheme(); });
+
+  const toggle = document.getElementById('navToggle');
+  const menu = document.getElementById('navMenu');
+  toggle.addEventListener('click', () => {
+    const open = menu.classList.toggle('open');
+    toggle.setAttribute('aria-expanded', open);
+  });
+  menu.querySelectorAll('a').forEach(a => a.addEventListener('click', () => {
+    menu.classList.remove('open');
+    toggle.setAttribute('aria-expanded', 'false');
+  }));
+</script>
+
+</body>
+</html>
